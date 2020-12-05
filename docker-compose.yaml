@@ -1,55 +1,57 @@
 version: '3.8'
 
 services:
-  nginx:
+  site:
     image: nginx:stable-alpine
     ports:
       - 8080:80
     environment:
-      TZ: Asia/Hong_Kong
+      TZ: ${TZ}
     volumes:
       - ./code:/code:ro
       - ./nginx/app.conf:/etc/nginx/conf.d/app.conf:ro
     depends_on:
       - php
-      - mysql
-      - redis
 
   php:
     image: app-php
-    build: ./php-fpm
-    volumes:
-      - ./code:/code
-
-  composer:
-    image: app-php
-    user: www-data
+    build:
+      context: ./php-fpm
+      args:
+        - GID=${GID}
+        - UID=${UID}
     environment:
-      ROLE: composer
-    volumes:
-      - ./code:/code
-      - composer:/tmp
-
-  queue:
-    image: app-php
-    environment:
-      ROLE: queue
+      CRON: ${CRON}
+      QUEUE: ${QUEUE}
     volumes:
       - ./code:/code
       - ./php-fpm/queue.log:/logs/queue.log
     depends_on:
-      - php
+      - mysql
       - redis
 
-  scheduler:
+  composer:
     image: app-php
-    environment:
-      ROLE: scheduler
+    user: www-data
+    entrypoint: ['composer']
     volumes:
       - ./code:/code
-    depends_on:
-      - php
-      - redis
+      - composer:/tmp
+
+  artisan:
+    image: app-php
+    user: www-data
+    entrypoint: ['php', '/code/artisan']
+    volumes:
+      - ./code:/code
+
+  npm:
+    image: node:alpine
+    user: node
+    working_dir: /code
+    entrypoint: ['npm']
+    volumes:
+      - ./code:/code
 
   mysql:
     image: mysql:8
@@ -58,7 +60,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: web
-      TZ: Asia/Hong_Kong
+      TZ: ${TZ}
     volumes:
       - mysql:/var/lib/mysql
     command: --default-authentication-plugin=mysql_native_password
