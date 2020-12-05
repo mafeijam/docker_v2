@@ -6,8 +6,5 @@ run `./init.sh`
 
 ### step 2 start the container
 
-run `docker-compose up -d nginx`
+run `docker-compose up -d site`
 
-### optional for queue and scheduler
-
-run `docker-compose up -d queue scheduler`
