@@ -1,5 +1,6 @@
 #!/bin/bash
 
+cp env-example .env
 mkdir code
 touch php-fpm/queue.log
 docker-compose build php
