@@ -8,3 +8,6 @@ run `./init.sh`
 
 run `docker-compose up -d site`
 
+### cron and queue
+
+set `.env CRON = Y, QUEUE = Y`
