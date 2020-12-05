@@ -2,3 +2,5 @@ code/*
 !code/.gitkeep
 
 php-fpm/queue.log
+
+.env
