@@ -14,7 +14,7 @@ fi
 
 if [ "$queue" = "Y" ]; then
 
-    supervisord
+    echo "queue starting..." & supervisord
 
 fi
 
