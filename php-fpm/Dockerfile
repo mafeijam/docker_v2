@@ -1,14 +1,25 @@
 FROM php:8-fpm
 
-RUN pecl install redis && docker-php-ext-enable redis
-
 RUN apt-get update -y \
     && apt-get upgrade -y \
     && apt-get install --no-install-recommends --no-install-suggests -y \
-        zip unzip libzip-dev cron supervisor procps \
+        zip \
+        unzip \
+        cron \
+        supervisor \
+        procps \
+        libzip-dev \
+        libpng-dev \
+        libjpeg62-turbo-dev \
+        libfreetype6-dev \
+        jpegoptim optipng pngquant gifsicle \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-install pdo_mysql bcmath zip
+RUN pecl install redis && docker-php-ext-enable redis
+
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+RUN docker-php-ext-install pdo_mysql bcmath zip gd exif
 
 ENV COMPOSER_HOME /tmp
 
